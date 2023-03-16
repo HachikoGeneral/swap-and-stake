@@ -4,7 +4,7 @@ pragma solidity ^0.8.7;
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract HireMeStake {
+contract WrappedChikoStake {
     mapping(address => mapping(address => bool)) public isStaker;
     mapping(address => mapping(address => uint256)) public amountStaked;
     mapping(address => mapping(address => uint256)) public lastRewardRedemption;
@@ -39,23 +39,7 @@ contract HireMeStake {
 
     constructor() {
         owner = msg.sender;
-        HireMeToken = IERC20(0x8ADc4D9E41eeC6Ef65C310FCEbeFC28e14ed2d1B);
-        isAllowed[0xd0A1E359811322d97991E03f863a0C30C2cF029C] = true;
-        isAllowed[0xa36085F69e2889c224210F603D836748e7dC0088] = true;
-        isAllowed[0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa] = true;
-        isAllowed[0x8ADc4D9E41eeC6Ef65C310FCEbeFC28e14ed2d1B] = true;
-        tokenPriceFeeds[
-            0xd0A1E359811322d97991E03f863a0C30C2cF029C
-        ] = 0x9326BFA02ADD2366b30bacB125260Af641031331; //weth
-        tokenPriceFeeds[
-            0xa36085F69e2889c224210F603D836748e7dC0088
-        ] = 0x396c5E36DD0a0F5a5D33dae44368D4193f69a1F0; //link
-        tokenPriceFeeds[
-            0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa
-        ] = 0x777A68032a88E5A84678A77Af2CD65A7b3c0775a; //dai
-        tokenPriceFeeds[
-            0x8ADc4D9E41eeC6Ef65C310FCEbeFC28e14ed2d1B
-        ] = 0x777A68032a88E5A84678A77Af2CD65A7b3c0775a; //HMT pegged to dai
+        WrappedChikoToken = IERC20(0x2e5E530dC2C6b2A8f214ee929dC4a302575881A9);
     }
 
     function deposit(address _token, uint256 _amount)
@@ -99,7 +83,7 @@ contract HireMeStake {
             hasRedeemed[msg.sender][_token] = true;
             lastRewardRedemption[msg.sender][_token] = block.timestamp;
             amountReedeemed[msg.sender][_token] += rewards;
-            HireMeToken.transfer(msg.sender, rewards);
+            WrappedChikoToken.transfer(msg.sender, rewards);
             emit RewardsRedeemed(msg.sender, _token, rewards, block.timestamp);
         } else {
             require(
@@ -115,7 +99,7 @@ contract HireMeStake {
             uint256 rewards = usdStaked / 50;
             lastRewardRedemption[msg.sender][_token] = block.timestamp;
             amountReedeemed[msg.sender][_token] += rewards;
-            HireMeToken.transfer(msg.sender, rewards);
+            WrappedChikoToken.transfer(msg.sender, rewards);
             emit RewardsRedeemed(msg.sender, _token, rewards, block.timestamp);
         }
     }
@@ -144,8 +128,8 @@ contract HireMeStake {
         isAllowed[_token] = false;
     }
 
-    function withdrawHMT() public onlyOwner {
-        HireMeToken.transfer(msg.sender, HireMeToken.balanceOf(address(this)));
+    function withdrawWCHK() public onlyOwner {
+        WrappedChikoToken.transfer(msg.sender, WrappedChikoToken.balanceOf(address(this)));
     }
 
     modifier onlyAllowed(address _token) {
