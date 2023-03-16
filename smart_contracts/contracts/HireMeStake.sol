@@ -14,7 +14,7 @@ contract WrappedChikoStake {
     mapping(address => address) public tokenPriceFeeds;
     address public owner;
     uint256 public totalAmountStaked;
-    IERC20 public HireMeToken;
+    IERC20 public WrappedChikoToken;
 
     event NewDeposit(
         address depositer,
